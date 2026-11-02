@@ -1,0 +1,7 @@
+{
+  "resource_pack_name": "minimap",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "minimap_minimap": { "textures": "textures/items/minimap" }
+  }
+}

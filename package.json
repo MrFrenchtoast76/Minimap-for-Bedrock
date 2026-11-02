@@ -1,0 +1,12 @@
+{
+  "name": "minimap-for-bedrock",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Xaero-style minimap add-on for Minecraft Bedrock",
+  "scripts": {
+    "generate": "node tools/generate.js",
+    "build": "node tools/generate.js && python3 tools/build.py",
+    "test": "node tools/selftest.js"
+  }
+}

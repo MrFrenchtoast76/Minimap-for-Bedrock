@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Minimap for Bedrock §7(BP)",
+    "description": "Xaero-style minimap: terrain, caves, entity radar, waypoints. Hold the Minimap item or use /minimap:menu.",
+    "uuid": "9b0c98ed-13bd-41ca-8137-6a0dd6d83c62",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 80]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "efcc36c6-084e-42fa-be73-91c1e3387bcb",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "20f63ee4-46b1-4d48-908c-efd992478907",
+      "entry": "scripts/main.js",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    { "uuid": "43ab3c3d-576a-4113-b76e-074025e8e0de", "version": [1, 0, 0] },
+    { "module_name": "@minecraft/server", "version": "2.0.0" },
+    { "module_name": "@minecraft/server-ui", "version": "2.0.0" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:item": {
+    "description": {
+      "identifier": "minimap:minimap",
+      "menu_category": { "category": "equipment" }
+    },
+    "components": {
+      "minecraft:icon": "minimap_minimap",
+      "minecraft:display_name": { "value": "item.minimap:minimap.name" },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": false
+    }
+  }
+}

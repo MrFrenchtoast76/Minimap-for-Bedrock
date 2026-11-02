@@ -1,0 +1,13 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:recipe_shapeless": {
+    "description": { "identifier": "minimap:minimap" },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "minecraft:compass" },
+      { "item": "minecraft:paper" }
+    ],
+    "unlock": [{ "item": "minecraft:compass" }],
+    "result": { "item": "minimap:minimap" }
+  }
+}
