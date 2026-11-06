@@ -51,7 +51,7 @@ button:focus-visible,input:focus-visible{outline:3px solid color-mix(in srgb,var
 #title{display:flex;flex-direction:column;line-height:1.1;flex:none}
 #title b{font-size:15px;font-weight:700;letter-spacing:-.02em}
 #title span{font-size:11px;font-weight:600;color:var(--accent)}
-#stats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;min-width:0}
+#stats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;min-width:0;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);padding-right:18px}
 #stats::-webkit-scrollbar{display:none}
 .stat{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:14px;flex:none}
 .stat svg{width:17px;height:17px;color:var(--label-2)}
@@ -588,9 +588,9 @@ function paintBg(top,bot){const k=top.getHexString()+bot.getHexString();if(k===b
 // soft studio environment for image based lighting, built once (no per-frame regeneration)
 const pmrem=new THREE.PMREMGenerator(renderer);
 (function(){const s=new THREE.Scene();
-  s.add(new THREE.Mesh(new THREE.BoxGeometry(12,12,12),new THREE.MeshBasicMaterial({color:new THREE.Color(0.32,0.34,0.37),side:THREE.BackSide})));
+  s.add(new THREE.Mesh(new THREE.BoxGeometry(12,12,12),new THREE.MeshBasicMaterial({color:new THREE.Color(0.12,0.13,0.14),side:THREE.BackSide})));
   const panel=(x,y,z,w,h,i,rx,ry,tint=[1,1,1])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(i*tint[0],i*tint[1],i*tint[2]),side:THREE.DoubleSide}));m.position.set(x,y,z);m.rotation.set(rx,ry,0);s.add(m)};
-  panel(0,5.9,0,8,8,3.2,Math.PI/2,0,[1,.98,.95]);panel(5.9,2,1,4,6,1.6,0,-Math.PI/2,[1,.95,.88]);panel(-5.9,2,-1,4,6,1.1,0,Math.PI/2,[.85,.92,1]);
+  panel(0,5.9,0,8,8,1.6,Math.PI/2,0,[1,.98,.95]);panel(5.9,2,1,4,6,0.8,0,-Math.PI/2,[1,.95,.88]);panel(-5.9,2,-1,4,6,0.55,0,Math.PI/2,[.85,.92,1]);
   panel(0,1.5,5.9,6,3,0.8,0,Math.PI);panel(0,-5.9,0,12,12,0.25,-Math.PI/2,0,[.8,.85,.7]);
   scene.environment=pmrem.fromScene(s,0.03).texture})();
 
@@ -614,7 +614,7 @@ function fitShadow(){
   const r=clamp(cam.dist*0.75+5,8,64),sc=sun.shadow.camera;
   if(sc.right!==r){sc.left=-r;sc.right=r;sc.top=r;sc.bottom=-r;sc.updateProjectionMatrix()}
   _f.copy(lightDir).negate();_r.crossVectors(_f,UP).normalize();_u.crossVectors(_r,_f);
-  const texel=2*r/sun.shadow.mapSize.x;_ctr.set(cam.tx,0,cam.tz);
+  const texel=2*r/sun.shadow.mapSize.x;sun.shadow.normalBias=texel*1.6;sun.shadow.bias=-0.0002;_ctr.set(cam.tx,0,cam.tz);
   const cr=_ctr.dot(_r),cu=_ctr.dot(_u);
   _ctr.addScaledVector(_r,Math.round(cr/texel)*texel-cr).addScaledVector(_u,Math.round(cu/texel)*texel-cu);
   sun.target.position.copy(_ctr);sun.position.copy(_ctr).addScaledVector(lightDir,110);sun.target.updateMatrixWorld();
@@ -631,12 +631,12 @@ function setLighting(){
   const a=(tod-6)/12*Math.PI,el=Math.sin(a);
   const day=smooth(-0.08,0.2,el),gold=day*(1-smooth(0.06,0.5,el));night=1-day;
   const d=new THREE.Vector3(),col=new THREE.Color();let inten;
-  if(el>-0.03){d.set(Math.cos(a)*0.85,el,0.45);inten=2.6*smooth(-0.03,0.22,el);col.copy(LC.sunWhite).lerp(LC.sunWarm,1-smooth(0.04,0.5,el))}
+  if(el>-0.03){d.set(Math.cos(a)*0.85,el,0.45);inten=3.2*smooth(-0.03,0.22,el);col.copy(LC.sunWhite).lerp(LC.sunWarm,1-smooth(0.04,0.5,el))}
   else{const am=a+Math.PI,me=Math.sin(am);d.set(Math.cos(am)*0.85,me,0.45);inten=0.6*smooth(0,0.3,me);col.copy(LC.moon)}
   d.y=Math.max(d.y,0.34);d.normalize();lightDir.copy(d);   // keep a minimum elevation: no endless streaks or acne at dawn/dusk
   sun.color.copy(col);sun.intensity=inten;
-  hemi.color.copy(LC.hemiDay).lerp(LC.hemiNight,night);hemi.groundColor.copy(LC.gDay).lerp(LC.gNight,night);hemi.intensity=0.42+0.1*night;
-  const envI=0.28+0.72*day;curEnvI=envI;for(const m of stdMats)m.envMapIntensity=m.userData.env*envI;
+  hemi.color.copy(LC.hemiDay).lerp(LC.hemiNight,night);hemi.groundColor.copy(LC.gDay).lerp(LC.gNight,night);hemi.intensity=0.16+0.22*night;
+  const envI=0.3+0.5*day;curEnvI=envI;for(const m of stdMats)m.envMapIntensity=m.userData.env*envI;
   const t=C('#000').copy(LC.bgDayT).lerp(LC.bgDuskT,gold*0.9).lerp(LC.bgNightT,night),b=C('#000').copy(LC.bgDayB).lerp(LC.bgDuskB,gold*0.9).lerp(LC.bgNightB,night);paintBg(t,b);
   for(const m of litMats)m.emissiveIntensity=m.userData.base*(0.02+night*1.1);
   glowMat.opacity=night*0.9;carLightMat.emissiveIntensity=0.2+night*2.6;
