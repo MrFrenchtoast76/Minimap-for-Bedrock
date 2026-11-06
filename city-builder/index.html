@@ -568,7 +568,7 @@ const cv=$('#c');
 const isTouch=matchMedia('(pointer:coarse)').matches;
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
 renderer.outputEncoding=THREE.sRGBEncoding;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.92;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const MAXANI=Math.min(8,renderer.capabilities.getMaxAnisotropy());
 const isGL2=renderer.capabilities.isWebGL2;
@@ -631,7 +631,7 @@ function setLighting(){
   const a=(tod-6)/12*Math.PI,el=Math.sin(a);
   const day=smooth(-0.08,0.2,el),gold=day*(1-smooth(0.06,0.5,el));night=1-day;
   const d=new THREE.Vector3(),col=new THREE.Color();let inten;
-  if(el>-0.03){d.set(Math.cos(a)*0.85,el,0.45);inten=3.2*smooth(-0.03,0.22,el);col.copy(LC.sunWhite).lerp(LC.sunWarm,1-smooth(0.04,0.5,el))}
+  if(el>-0.03){d.set(Math.cos(a)*0.85,el,0.45);inten=2.0*smooth(-0.03,0.22,el);col.copy(LC.sunWhite).lerp(LC.sunWarm,1-smooth(0.04,0.5,el))}
   else{const am=a+Math.PI,me=Math.sin(am);d.set(Math.cos(am)*0.85,me,0.45);inten=0.6*smooth(0,0.3,me);col.copy(LC.moon)}
   d.y=Math.max(d.y,0.34);d.normalize();lightDir.copy(d);   // keep a minimum elevation: no endless streaks or acne at dawn/dusk
   sun.color.copy(col);sun.intensity=inten;
@@ -1217,7 +1217,7 @@ const camT={...cam};
 const ray=new THREE.Raycaster(),groundPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0),_ndc=new THREE.Vector2(),_hit=new THREE.Vector3();
 let VW=1,VH=1;
 function applyCam(){const cp=Math.cos(cam.pitch);camera.position.set(cam.tx+Math.sin(cam.yaw)*cp*cam.dist,Math.sin(cam.pitch)*cam.dist,cam.tz+Math.cos(cam.yaw)*cp*cam.dist);
-  camera.lookAt(cam.tx,0,cam.tz);camera.updateMatrixWorld()}
+  camera.lookAt(cam.tx,0,cam.tz);const nr=clamp(cam.dist*0.04,0.15,4),fr=cam.dist*3+160;if(Math.abs(camera.near-nr)>0.01||camera.far!==fr){camera.near=nr;camera.far=fr;camera.updateProjectionMatrix()}camera.updateMatrixWorld()}
 function groundAt(sx,sy){_ndc.set(sx/VW*2-1,-(sy/VH)*2+1);ray.setFromCamera(_ndc,camera);return ray.ray.intersectPlane(groundPlane,_hit)?_hit.clone():null}
 function tileAt(sx,sy){const p=groundAt(sx,sy);if(!p)return null;return{x:Math.floor(p.x+W/2),y:Math.floor(p.z+H/2)}}
 function clampTarget(o){o.tx=clamp(o.tx,-W/2-4,W/2+4);o.tz=clamp(o.tz,-H/2-4,H/2+4);o.dist=clamp(o.dist,3.5,140);o.pitch=clamp(o.pitch,0.25,1.45)}
