@@ -926,7 +926,7 @@ for(let idx=0;idx<32;idx++)geo('rm'+idx,()=>{const g=new THREE.PlaneGeometry(1,1
 const carBodyGeo=mergeGeos([new THREE.BoxGeometry(0.17,0.034,0.084).translate(0,0.033,0),new THREE.BoxGeometry(0.084,0.008,0.07).translate(-0.01,0.079,0),new THREE.BoxGeometry(0.03,0.012,0.08).translate(0.07,0.054,0)]);
 const carGlassGeo=new THREE.BoxGeometry(0.092,0.026,0.074).translate(-0.01,0.062,0);
 const wheelGeo=mergeGeos([[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b])=>new THREE.CylinderGeometry(0.019,0.019,0.014,12).rotateX(Math.PI/2).translate(a*0.052,0.019,b*0.04)));
-geo('arch',()=>{const sh=new THREE.Shape();sh.moveTo(-0.5,-0.64);sh.lineTo(-0.5,-0.02);sh.lineTo(0.5,-0.02);sh.lineTo(0.5,-0.64);sh.lineTo(0.42,-0.64);sh.absarc(0,-0.64,0.42,0,Math.PI,false);sh.lineTo(-0.5,-0.64);
+geo('arch',()=>{const sh=new THREE.Shape();sh.moveTo(-0.5,-0.7);sh.lineTo(-0.5,-0.02);sh.lineTo(0.5,-0.02);sh.lineTo(0.5,-0.7);sh.lineTo(0.45,-0.7);sh.absarc(0,-0.7,0.45,0,Math.PI,false);sh.lineTo(-0.5,-0.7);
   const g=new THREE.ExtrudeGeometry(sh,{depth:0.9,bevelEnabled:false,curveSegments:16});g.translate(0,0,-0.45);const uv=g.attributes.uv;for(let k=0;k<uv.count;k++)uv.setXY(k,uv.getX(k)*2.5,uv.getY(k)*2.5);return g});
 const bladeGeo=(()=>{const g=new THREE.BoxGeometry(0.035,0.85,0.012);g.translate(0,0.43,0);return g})();
 
@@ -1145,7 +1145,7 @@ groundMat.onBeforeCompile=(sh)=>{
 groundMat.customProgramCacheKey=()=>'ground';
 const ground=new THREE.Mesh(groundGeo,groundMat);ground.receiveShadow=true;scene.add(ground);
 const waterMat=std({color:'#2f7f99',roughness:0.05,metalness:0.1,normalMap:waterNormal,normalScale:new THREE.Vector2(0.3,0.3),transparent:true,opacity:0.92},1.6);
-const WL=-0.14;
+const WL=-0.3;
 const water=new THREE.Mesh(new THREE.PlaneGeometry(W,H).rotateX(-Math.PI/2),waterMat);water.position.y=WL;water.receiveShadow=true;scene.add(water);
 let water2=null,useRefl=!isTouch;
 if(THREE.Water){water2=new THREE.Water(new THREE.PlaneGeometry(W,H),{textureWidth:isTouch?384:768,textureHeight:isTouch?384:768,waterNormals:waterNormal,sunDirection:new THREE.Vector3(0.4,0.8,0.4),sunColor:0xffffff,waterColor:0x2a8299,distortionScale:1.4,fog:false,clipBias:0.002});
