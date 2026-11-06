@@ -1724,7 +1724,7 @@ function start(data){
   $('#loading').hidden=true;requestAnimationFrame(frame);
 }
 addEventListener('resize',resize);
-window.__game={get G(){return G},stats,dem,placeRoad,linePath,zoneRect,placeService,simDay,inspect,get services(){return services},cam,camT,setTod:v=>{tod=v;clockRuns=false},renderer,rebuildScene};
+window.__game={tiles:()=>({road,terrain,W,H}),get G(){return G},stats,dem,placeRoad,linePath,zoneRect,placeService,simDay,inspect,get services(){return services},cam,camT,setTod:v=>{tod=v;clockRuns=false},renderer,rebuildScene};
 window.claude?.hot?.snapshot?.(()=>({save:serialize()}));
 const boot=d=>texturesReady.then(()=>start(d));
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
