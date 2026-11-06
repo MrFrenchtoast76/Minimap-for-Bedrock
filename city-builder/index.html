@@ -147,6 +147,7 @@ kbd{font-family:var(--font);background:var(--glass-strong);border-radius:6px;pad
 #loading{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);font-size:17px;font-weight:600;color:var(--label-2);text-align:center;padding:24px}
 @keyframes tin{from{transform:translateY(-14px) scale(.96);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.toast{animation:none}.switch,.switch::before{transition:none}}
+@media (max-height:640px){#mini{display:none}}
 @media (max-width:760px){
   #top{flex-wrap:wrap}
   #status{order:2;flex:1 1 100%;max-width:none;padding:6px 6px 6px 12px;border-radius:18px}
