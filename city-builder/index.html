@@ -1598,9 +1598,10 @@ function updateWeather(dt){
       arr[k*3]=cx+(snowSt[k*3]+Math.sin(time*0.7+k)*0.02)*R;arr[k*3+1]=k<n?y*Hh:-50;arr[k*3+2]=cz+snowSt[k*3+2]*R}
     snowPts.material.size=clamp(cam.dist*0.006,0.04,0.25);snowGeo.attributes.position.needsUpdate=true}
   if(wCur.storm>0.5){flashT-=dt;if(flashT<0){flash=1;flashT=2+Math.random()*7}}flash=Math.max(0,flash-dt*5);
-  const fogFar=wCur.fog>0.02?clamp(cam.dist*(2.8-1.9*wCur.fog)+12,cam.dist+6,400):1e5;scene.fog.near=fogFar*0.25;scene.fog.far=fogFar;
+  const fogFar=wCur.fog>0.02?clamp(cam.dist*(3.2-2.5*wCur.fog)+5-3*wCur.fog,cam.dist*0.55+2,400):1e5;scene.fog.near=wCur.fog>0.02?fogFar*(0.35-0.3*wCur.fog):fogFar*0.25;scene.fog.far=fogFar;
   for(const k of WET_MATS){const m=MATS.get(k);if(!m||Array.isArray(m))continue;if(m.userData.r0===undefined)m.userData.r0=m.roughness;m.roughness=m.userData.r0*(1-0.65*wCur.wet)}
-  for(const k of['roofTile','roofSlate','roofFlat']){const m=MATS.get(k);if(!m||Array.isArray(m))continue;if(!m.userData.c0)m.userData.c0=m.color.clone();m.color.copy(m.userData.c0).lerp(new THREE.Color(1.6,1.6,1.7),wCur.snow*0.75)}
+  for(const k of['roofTile','roofSlate','roofFlat','roofMetal','hedge','leafCore','lotGarden','lawn']){const m=MATS.get(k);if(!m||Array.isArray(m))continue;if(!m.userData.c0)m.userData.c0=m.color.clone();m.color.copy(m.userData.c0).lerp(new THREE.Color(1.6,1.6,1.7),wCur.snow*0.75);m.emissive.setRGB(0.62,0.64,0.68).multiplyScalar(wCur.snow*(k.startsWith('roof')?0.8:0.45))}
+  roofMat.emissive.setRGB(0.62,0.64,0.68).multiplyScalar(wCur.snow*0.8);
   const lm=MATS.get('leaf');if(lm&&!Array.isArray(lm)){if(!lm.userData.c0)lm.userData.c0=lm.color.clone();lm.color.copy(lm.userData.c0).lerp(new THREE.Color(1.5,1.5,1.5),wCur.snow*0.45)}
 }
 function weatherLabel(){const k=weatherMode==='auto'?wKey:weatherMode,m=Math.floor(G.day/30)%12;return{k,name:WEATHER[k].name,temp:Math.round(MONTH_TEMP[m]+WEATHER[k].temp+Math.sin(tod/24*6.283-1.6)*3)}}
