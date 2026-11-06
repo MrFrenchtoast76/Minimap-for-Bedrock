@@ -663,6 +663,7 @@ function rasterRoads(){
         if(d<ROAD_MARK)road[i]=Math.max(road[i],v);if(d<rdDist[i]){rdDist[i]=d;rdX[i]=o.x;rdZ[i]=o.z}}}}
   for(let i=0;i<N;i++)if(road[i]&&!old[i]){zone[i]=0;lvl[i]=0;occ[i]=0;aband[i]=0;tree[i]=0}
   roadsDirty=true;sceneDirty=groundDirty=true;mapsDirty=true;dirty=true;computeNetworks();
+  if(typeof rebuildTrafficGraph==='function')rebuildTrafficGraph();
 }
 function rnFromTiles(){RN={nodes:[],edges:[]};const id=new Int32Array(N).fill(-1);
   for(let i=0;i<N;i++)if(road[i]){id[i]=RN.nodes.push({x:wx(i%W),z:wz((i/W)|0)})-1}
@@ -1509,7 +1510,7 @@ function rebuildTrafficGraph(){
 function pickType(){let r=Math.random();for(let k=0;k<CAR_TYPES.length;k++){r-=CAR_TYPES[k].p;if(r<=0)return k}return 0}
 function advance(a,dt){
   let e=RN.edges[a.e];if(!e)return false;let p=edgePts(e);a.s+=dt;let guard=0;
-  while(a.s>=p.len&&guard++<8){a.s-=p.len;const node=a.fwd?e.b:e.a;let opts=nodeEdges[node].filter(j=>j!==a.e&&(!a.walk||!RN.edges[j].hw));if(!opts.length)opts=[a.e];
+  while(a.s>=p.len&&guard++<8){a.s-=p.len;const node=a.fwd?e.b:e.a;if(!nodeEdges[node])return false;let opts=nodeEdges[node].filter(j=>j!==a.e&&(!a.walk||!RN.edges[j].hw));if(!opts.length)opts=[a.e];
     const nx=opts[(Math.random()*opts.length)|0];a.fwd=RN.edges[nx].a===node;a.e=nx;e=RN.edges[nx];p=edgePts(e)}
   return true}
 const _o={},_m3=new THREE.Matrix4(),_q2=new THREE.Quaternion();
@@ -2028,7 +2029,8 @@ $('#bNew').onclick=e=>{const b=e.currentTarget;if(Date.now()-newArmed>3000){newA
 function newGame(seed){genMap(seed);syncTax();Object.assign(camT,{tx:wx(8),tz:wz(HW_Y),dist:isTouch?22:28,yaw:-0.7,pitch:0.8});Object.assign(cam,camT);
   selectTool('road','road');renderBudget();renderMilestones()}
 let acc=0,last=performance.now(),hudT=0,miniT=0,rebuildT=0,ovT=0,time=0;
-function frame(t){
+function frame(t){try{frameBody(t)}catch(err){console.error(err)}requestAnimationFrame(frame)}
+function frameBody(t){
   const dt=Math.min(0.1,(t-last)/1000);last=t;time+=dt;keyCam(dt);
   if(speed>0){acc+=dt;const s=SPD[speed];let n=0;while(acc>=s&&n<4){acc-=s;simDay();n++}if(n>=4)acc=0;
     if(clockRuns)tod=(tod+dt*24/150*[0,1,2,4][speed])%24}
@@ -2046,7 +2048,7 @@ function frame(t){
   render();
   hudT+=dt;if(hudT>0.25){hudT=0;updateHUD()}
   miniT+=dt;if(miniT>0.5){miniT=0;drawMini()}
-  requestAnimationFrame(frame);
+
 }
 function start(data){
   resize();
