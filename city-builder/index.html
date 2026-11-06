@@ -1574,7 +1574,7 @@ const puffCloud=canvasTex(256,128,(g)=>{const r=mulberry(31);for(let k=0;k<26;k+
 const cloudSprites=[];{const r=mulberry(12);for(let k=0;k<18;k++){const m=new THREE.SpriteMaterial({map:puffCloud,transparent:true,depthWrite:false,opacity:0,fog:false});const sp=new THREE.Sprite(m);
   const s=8+r()*9;sp.scale.set(s,s*0.5,1);sp.position.set((r()-0.5)*W*1.1,9+r()*5,(r()-0.5)*H*1.1);sp.userData.v=0.4+r()*0.4;sp.renderOrder=6;scene.add(sp);cloudSprites.push(sp)}}
 const RAIN_N=isTouch?700:1500;const rainPos=new Float32Array(RAIN_N*6);const rainGeo=new THREE.BufferGeometry();rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
-const rainLines=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0xcfd9e6,transparent:true,opacity:0.5,depthWrite:false}));rainLines.frustumCulled=false;rainLines.visible=false;scene.add(rainLines);
+const rainLines=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0xe6eef8,transparent:true,opacity:0.5,depthWrite:false,fog:false}));rainLines.frustumCulled=false;rainLines.visible=false;scene.add(rainLines);
 const snowPos=new Float32Array(RAIN_N*3);const snowGeo=new THREE.BufferGeometry();snowGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
 const snowPts=new THREE.Points(snowGeo,new THREE.PointsMaterial({color:0xffffff,size:0.06,transparent:true,opacity:0.9,depthWrite:false,map:puffTex}));snowPts.frustumCulled=false;snowPts.visible=false;scene.add(snowPts);
 const rainSt=new Float32Array(RAIN_N*3),snowSt=new Float32Array(RAIN_N*3);for(let k=0;k<RAIN_N*3;k+=3){rainSt[k]=snowSt[k]=Math.random()*2-1;rainSt[k+1]=snowSt[k+1]=Math.random();rainSt[k+2]=snowSt[k+2]=Math.random()*2-1}
@@ -1582,14 +1582,14 @@ scene.fog=new THREE.Fog(0xd9e0e8,2.5e4,1e5);
 const weatherU={uCloud:{value:0},uWet:{value:0},uSnow:{value:0},uWind:{value:new THREE.Vector2()},cloudMap:{value:cloudTex}};
 const WET_MATS=['asphalt','sidewalk','roofFlat','roofTile','roofSlate','lotPave','paving'];
 function updateWeather(dt){
-  const T3=weatherTarget(),a=1-Math.exp(-dt*0.6);for(const k of['cloud','rain','fog','storm','snow'])wCur[k]+=(T3[k]-wCur[k])*a;
+  const T3=weatherTarget(),a=1-Math.exp(-dt*1.3);for(const k of['cloud','rain','fog','storm','snow'])wCur[k]+=(T3[k]-wCur[k])*a;
   wCur.wet+=((wCur.rain>0.2?1:0)-wCur.wet)*(1-Math.exp(-dt*(wCur.rain>0.2?0.5:0.06)));
   weatherU.uCloud.value=wCur.cloud;weatherU.uWet.value=wCur.wet;weatherU.uSnow.value=wCur.snow;weatherU.uWind.value.set(time*0.004,time*0.0025);
   for(const sp of cloudSprites){sp.position.x+=sp.userData.v*dt*0.6;if(sp.position.x>W*0.6)sp.position.x=-W*0.6;sp.material.opacity=clamp(wCur.cloud*1.1-0.1,0,0.92);
     sp.material.color.setScalar(1-night*0.75-wCur.storm*0.35)}
   const R=clamp(cam.dist*0.55+4,5,40),Hh=clamp(cam.dist*0.45,4,18),cx=cam.tx,cz=cam.tz,sp=dt*(speed?1:0.4);
   rainLines.visible=wCur.rain>0.03;snowPts.visible=wCur.snow>0.03;
-  if(rainLines.visible){rainLines.material.opacity=0.45*wCur.rain;const n=Math.floor(RAIN_N*wCur.rain),arr=rainPos;
+  if(rainLines.visible){rainLines.material.opacity=Math.min(0.9,0.9*wCur.rain+0.1);const n=Math.floor(RAIN_N*wCur.rain),arr=rainPos;
     for(let k=0;k<RAIN_N;k++){let y=rainSt[k*3+1]-sp*1.6;if(y<0){y+=1;rainSt[k*3]=Math.random()*2-1;rainSt[k*3+2]=Math.random()*2-1}rainSt[k*3+1]=y;
       const x=cx+rainSt[k*3]*R,z=cz+rainSt[k*3+2]*R,yy=y*Hh,vis=k<n;arr[k*6]=x;arr[k*6+1]=vis?yy:-50;arr[k*6+2]=z;arr[k*6+3]=x+0.04;arr[k*6+4]=vis?yy+0.32:-50;arr[k*6+5]=z+0.02}
     rainGeo.attributes.position.needsUpdate=true}
@@ -2060,7 +2060,7 @@ function start(data){
   $('#loading').hidden=true;requestAnimationFrame(frame);
 }
 addEventListener('resize',resize);
-window.__game={dbg:()=>({wCur:{...wCur},weatherMode,frames:time,roadMeshes:roadGroup.children.map(m=>[m.material.type,m.geometry.attributes.position.count])}),tiles:()=>({road,terrain,W,H}),RN:()=>RN,addRoad,snapPoint,setWeather:k=>{weatherMode=k},budgetForecast,get G(){return G},stats,dem,placeRoad,linePath,zoneRect,placeService,simDay,inspect,get services(){return services},cam,camT,setTod:v=>{tod=v;clockRuns=false},renderer,rebuildScene};
+window.__game={dbg:()=>({wCur:{...wCur},weatherMode,frames:time,roadMeshes:roadGroup.children.map(m=>[m.material.type,m.geometry.attributes.position.count])}),tiles:()=>({road,terrain,W,H}),RN:()=>RN,addRoad,snapPoint,setWeather:(k,now)=>{weatherMode=k;if(now){const t=weatherTarget();for(const q of['cloud','rain','fog','storm','snow'])wCur[q]=t[q];wCur.wet=t.rain>0.2?1:0}},budgetForecast,get G(){return G},stats,dem,placeRoad,linePath,zoneRect,placeService,simDay,inspect,get services(){return services},cam,camT,setTod:v=>{tod=v;clockRuns=false},renderer,rebuildScene};
 window.claude?.hot?.snapshot?.(()=>({save:serialize()}));
 const boot=d=>texturesReady.then(()=>start(d));
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
