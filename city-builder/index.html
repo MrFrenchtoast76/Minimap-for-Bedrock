@@ -823,7 +823,7 @@ const PLAIN={
   roofTile:()=>std({map:T('roof'),normalMap:T('roof','nor'),roughnessMap:T('roof','rough'),roughness:1}),
   roofSlate:()=>std({map:T('slate'),normalMap:T('slate','nor'),roughnessMap:T('slate','rough'),roughness:1}),
   roofMetal:()=>std({map:T('metal'),normalMap:T('metal','nor'),color:'#d0d4d8',metalness:0.45,roughness:0.6}),
-  lotGarden:()=>pbr('grass',{color:'#d6eab8'},0.55,0.5),lawn:()=>pbr('grass',{color:'#dcefc0'},0.55,0.5),
+  lotGarden:()=>pbr('grass',{color:'#9fd07a'},0.55,0.5),lawn:()=>pbr('grass',{color:'#a6d882'},0.55,0.5),
   lotPave:()=>pbr('pavers',{},1.5),sidewalk:()=>pbr('pavers',{color:'#f0ece6'},1.8),lotInd:()=>pbr('conc',{color:'#c9c3b8'},0.9),
   asphalt:()=>pbr('asphalt',{},0.9),paving:()=>pbr('paving',{},1.3),gravel:()=>pbr('gravel',{},1.2),roofFlat:()=>pbr('gravel',{color:'#d8d4cc'},1.8),
   concrete:()=>std({map:T('conc'),normalMap:T('conc','nor'),color:'#d8d6d0',roughness:0.9}),concreteLight:()=>std({map:T('conc'),normalMap:T('conc','nor'),color:'#f0eee8',roughness:0.85}),
@@ -835,7 +835,7 @@ const PLAIN={
   hedge:{color:'#3f6e30',roughness:1},brickPlain:()=>std({map:T('brick'),normalMap:T('brick','nor'),roughness:0.9}),white:{color:'#f1f2f3',roughness:0.45},
   metal:{color:'#a7adb3',metalness:0.7,roughness:0.35},metalDark:{color:'#3a3e44',metalness:0.6,roughness:0.45},acUnit:{color:'#cfd2d6',metalness:0.3,roughness:0.5},
   fanTop:{map:fanTex,metalness:0.4,roughness:0.5},woodTank:{color:'#8a6646',roughness:0.85},glassRoof:{color:'#a9c6dc',metalness:0.6,roughness:0.1},
-  glassRail:{color:'#a8c4d4',metalness:0.3,roughness:0.05,transparent:true,opacity:0.45},roofGarden:()=>pbr('grass',{color:'#cfe8b0'},0.8,0.5),
+  glassRail:{color:'#a8c4d4',metalness:0.3,roughness:0.05,transparent:true,opacity:0.45},roofGarden:()=>pbr('grass',{color:'#9fd07a'},0.8,0.5),
   tank:{color:'#e2e3e4',metalness:0.35,roughness:0.35},chimney:{color:'#948f88',roughness:0.9},chimRed:{color:'#b5463a',roughness:0.8},
   solar:{color:'#1a2f52',metalness:0.75,roughness:0.12},pipe:{color:'#6d7a86',metalness:0.6,roughness:0.4},tankBlue:{color:'#8db0cc',metalness:0.35,roughness:0.35},
   sportfield:{map:fieldTex,roughness:1},redcross:{map:crossTex,roughness:0.8},helipad:{map:heliTex,roughness:0.9},garage:{color:'#5b6168',metalness:0.4,roughness:0.5},
@@ -1104,7 +1104,7 @@ groundMat.onBeforeCompile=(sh)=>{
   const GW='(vWP.xz*0.35)';
   sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vWP;\nuniform sampler2D grassMap,sandMap,mudMap,maskMap;')
     .replace('#include <normalmap_pars_fragment>',THREE.ShaderChunk.normalmap_pars_fragment.replace(/vUv/g,GW))
-    .replace('#include <map_fragment>',`vec3 g1=texture2D(grassMap,vWP.xz*0.35).rgb,g2=texture2D(grassMap,vWP.xz*0.083+0.31).rgb;vec3 base=mix(g1,g2,0.42)*vec3(0.98,1.03,0.92);
+    .replace('#include <map_fragment>',`vec3 g1=texture2D(grassMap,vWP.xz*0.35).rgb,g2=texture2D(grassMap,vWP.xz*0.083+0.31).rgb;vec3 graw=mix(g1,g2,0.42);float gl=dot(graw,vec3(0.3,0.59,0.11));vec3 lush=mix(vec3(0.13,0.24,0.07),vec3(0.36,0.52,0.17),smoothstep(0.12,0.5,gl));vec3 base=mix(lush,graw,0.22);
       vec4 mk=texture2D(maskMap,vUv);base=mix(base,texture2D(sandMap,vWP.xz*0.55).rgb,mk.r);base=mix(base,texture2D(mudMap,vWP.xz*0.45).rgb*0.8,mk.g);
       vec4 zc=texture2D(map,vUv);base=mix(base,base*0.5+zc.rgb*0.5,zc.a);diffuseColor.rgb*=base;`)
     .replace('#include <normal_fragment_maps>',THREE.ShaderChunk.normal_fragment_maps.replace(/vUv/g,GW))
@@ -1115,7 +1115,8 @@ const waterMat=std({color:'#2f7f99',roughness:0.05,metalness:0.1,normalMap:water
 const WL=-0.14;
 const water=new THREE.Mesh(new THREE.PlaneGeometry(W,H).rotateX(-Math.PI/2),waterMat);water.position.y=WL;water.receiveShadow=true;scene.add(water);
 let water2=null,useRefl=!isTouch;
-if(THREE.Water){water2=new THREE.Water(new THREE.PlaneGeometry(W,H),{textureWidth:isTouch?384:768,textureHeight:isTouch?384:768,waterNormals:waterNormal,sunDirection:new THREE.Vector3(0.4,0.8,0.4),sunColor:0xffffff,waterColor:0x1b5566,distortionScale:1.4,fog:false,clipBias:0.002});
+if(THREE.Water){water2=new THREE.Water(new THREE.PlaneGeometry(W,H),{textureWidth:isTouch?384:768,textureHeight:isTouch?384:768,waterNormals:waterNormal,sunDirection:new THREE.Vector3(0.4,0.8,0.4),sunColor:0xffffff,waterColor:0x2a8299,distortionScale:1.4,fog:false,clipBias:0.002});
+  water2.material.fragmentShader=water2.material.fragmentShader.replace('vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );','vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) )*vec3(0.5,0.74,0.84);');
   water2.rotation.x=-Math.PI/2;water2.position.y=WL;water2.material.uniforms.size.value=4.5;water2.receiveShadow=true;scene.add(water2)}
 function applyWater(){if(water2){water2.visible=useRefl;water.visible=!useRefl}else{water.visible=true}}
 const slabGroup=new THREE.Group();scene.add(slabGroup);
@@ -1643,7 +1644,7 @@ function frame(t){
   ovT+=dt;if(ovMesh.visible&&ovT>0.5){ovT=0;drawOverlay()}
   setLighting();stepCam(dt);fitShadow();
   waterNormal.offset.set(time*0.012,time*0.007);
-  if(water2&&water2.visible){const u=water2.material.uniforms;u.time.value+=dt*0.5;u.sunDirection.value.copy(lightDir);u.sunColor.value.copy(sun.color).multiplyScalar(Math.min(1,sun.intensity/2.2));u.waterColor.value.set('#1b5566').lerp(new THREE.Color('#081822'),night*0.75)}
+  if(water2&&water2.visible){const u=water2.material.uniforms;u.time.value+=dt*0.5;u.sunDirection.value.copy(lightDir);u.sunColor.value.copy(sun.color).multiplyScalar(Math.min(1,sun.intensity/2.2));u.waterColor.value.set('#2a8299').lerp(new THREE.Color('#081822'),night*0.75)}
   for(const r of rotors)if(r.userData.on)r.rotation.z-=dt*(1.6+speed*0.4);
   updateSmoke(time);updateCars(dt);
   const blink=Math.floor(time*2)%3!==0;for(const s of icons)if(s.visible)s.material.opacity=blink?1:0.35;
